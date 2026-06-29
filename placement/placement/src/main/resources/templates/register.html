@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/style.css.html">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="student">Student</option>
+                <option value="recruiter">Recruiter</option>
+                <option value="tpo">TPO</option>
+            </select>
+            <div id="studentFields" class="role-fields">
+                <label for="studentName">Name:</label>
+                <input type="text" id="studentName" name="name">
+                <label for="studentEmail">Email:</label>
+                <input type="email" id="studentEmail" name="email">
+                <label for="studentBranch">Branch:</label>
+                <input type="text" id="studentBranch" name="branch">
+                <label for="studentCgpa">CGPA:</label>
+                <input type="number" step="0.01" id="studentCgpa" name="cgpa">
+                <label for="studentPassword">Password:</label>
+                <input type="password" id="studentPassword" name="password">
+            </div>
+            <div id="recruiterFields" class="role-fields" style="display:none;">
+                <label for="recruiterName">Name:</label>
+                <input type="text" id="recruiterName" name="name">
+                <label for="recruiterEmail">Email:</label>
+                <input type="email" id="recruiterEmail" name="email">
+                <label for="recruiterCompany">Company:</label>
+                <input type="text" id="recruiterCompany" name="company">
+                <label for="recruiterPassword">Password:</label>
+                <input type="password" id="recruiterPassword" name="password">
+            </div>
+            <div id="tpoFields" class="role-fields" style="display:none;">
+                <label for="tpoName">Name:</label>
+                <input type="text" id="tpoName" name="name">
+                <label for="tpoEmail">Email:</label>
+                <input type="email" id="tpoEmail" name="email">
+                <label for="tpoPassword">Password:</label>
+                <input type="password" id="tpoPassword" name="password">
+            </div>
+            <button type="submit">Register</button>
+        </form>
+        <div id="registerMessage"></div>
+        <a href="/login">Already have an account? Login</a>
+    </div>
+    <script>
+        const roleSelect = document.getElementById('role');
+        const studentFields = document.getElementById('studentFields');
+        const recruiterFields = document.getElementById('recruiterFields');
+        const tpoFields = document.getElementById('tpoFields');
+        roleSelect.addEventListener('change', function() {
+            studentFields.style.display = this.value === 'student' ? '' : 'none';
+            recruiterFields.style.display = this.value === 'recruiter' ? '' : 'none';
+            tpoFields.style.display = this.value === 'tpo' ? '' : 'none';
+        });
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const role = roleSelect.value;
+            let url = '/api/auth/register/' + role;
+            let payload = {};
+            if (role === 'student') {
+                payload = {
+                    name: document.getElementById('studentName').value,
+                    email: document.getElementById('studentEmail').value,
+                    branch: document.getElementById('studentBranch').value,
+                    cgpa: document.getElementById('studentCgpa').value,
+                    password: document.getElementById('studentPassword').value
+                };
+            } else if (role === 'recruiter') {
+                payload = {
+                    name: document.getElementById('recruiterName').value,
+                    email: document.getElementById('recruiterEmail').value,
+                    company: document.getElementById('recruiterCompany').value,
+                    password: document.getElementById('recruiterPassword').value
+                };
+            } else if (role === 'tpo') {
+                payload = {
+                    name: document.getElementById('tpoName').value,
+                    email: document.getElementById('tpoEmail').value,
+                    password: document.getElementById('tpoPassword').value
+                };
+            }
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                document.getElementById('registerMessage').innerText = data.message || 'Registration complete.';
+                if (res.ok) {
+                    setTimeout(() => window.location.href = '/login', 1500);
+                }
+            } catch (err) {
+                document.getElementById('registerMessage').innerText = 'Registration failed.';
+            }
+        });
+    </script>
+</body>
+
+</html>

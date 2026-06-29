@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Placement Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="student">Student</option>
+            <option value="recruiter">Recruiter</option>
+            <option value="tpo">TPO</option>
+        </select><br><br>
+        <label for="username">Username/Email:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+    <p id="loginMsg"></p>
+    <p>Don't have an account? <a href="/register.html">Register here</a></p>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const role = document.getElementById('role').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    role,
+                    username,
+                    password
+                })
+            });
+            const data = await res.json();
+            if (res.ok && data.token) {
+                localStorage.setItem('token', data.token);
+                document.getElementById('loginMsg').textContent = 'Login successful! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = `/${role}-dashboard.html`;
+                }, 1000);
+            } else {
+                document.getElementById('loginMsg').textContent = data.message || 'Login failed!';
+            }
+        });
+    </script>
+</body>
+
+</html>
