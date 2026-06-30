@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: placement-mysql-container
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: placement_db
+      MYSQL_USER: divyanshu
+      MYSQL_PASSWORD: password123
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  springboot-app:
+    image: divyanshu41/placement-springboot-app:latest
+
+    container_name: placement-springboot-container
+
+    ports:
+      - "8050:8050"
+
+    depends_on:
+      - mysql
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3307/placement_db
+      SPRING_DATASOURCE_USERNAME: divyanshu
+      SPRING_DATASOURCE_PASSWORD: password123
+
+volumes:
+  mysql-data:
